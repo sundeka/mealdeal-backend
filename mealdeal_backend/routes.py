@@ -1,23 +1,23 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
 from .db import Database
 
 app = Flask(__name__)
 
 @app.post("/auth")
-def authenticate():
+def authenticate() -> Response:
     # TODO
     return jsonify({"auth": True})
 
 @app.get("/foods")
-def get_foods():
+def get_foods() -> Response:
     foods = []
     with Database() as db:
         foods = db.get_foods()
     return jsonify(foods)
 
 @app.get("/meals")
-def get_meals():
+def get_meals() -> Response:
     meals = []
     with Database() as db:
         meals = db.get_meals()
-    return meals
+    return jsonify(meals)

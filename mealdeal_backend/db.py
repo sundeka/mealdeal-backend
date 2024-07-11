@@ -1,16 +1,28 @@
-import sqlite3
-from flask import g
+import pyodbc
 from typing import List
 from .schema import Food, Meal
 
+driver = server = port = user = password = database = None
+
+with open('conninfo.txt', 'r') as f:
+    lines = f.readlines()
+
+if len(lines) >= 6:
+    driver = lines[0].strip()
+    server = lines[1].strip()
+    port = lines[2].strip()
+    user = lines[3].strip()
+    password = lines[4].strip()
+    database = lines[5].strip()
+
+connection_string = f'DRIVER={driver};SERVER={server};PORT={port};UID={user};PWD={password};DATABASE={database}'
+
 class Database:
     def __init__(self):
-        self.db = getattr(g, '_database', None)
-        if self.db is None:
-            self.db = g._database = sqlite3.connect("mealdeal.db")
-        self.cursor = self.db.cursor()
         self.table_foods = "foods"
         self.table_meals = "meals"
+        self.db = pyodbc.connect(connection_string)
+        self.cursor = self.db.cursor()
 
     def __enter__(self):
         return self
