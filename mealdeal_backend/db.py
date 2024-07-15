@@ -1,6 +1,6 @@
 import pyodbc
 from typing import List
-from .schema import Food, Meal
+from .schema import Food, Meal, MealType
 
 driver = server = port = user = password = database = None
 
@@ -21,6 +21,7 @@ class Database:
     def __init__(self):
         self.table_foods = "foods"
         self.table_meals = "meals"
+        self.table_types = "meal_types"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -62,3 +63,16 @@ class Database:
                 )
             )
         return meals
+    
+    def get_types(self) -> List[MealType]:
+        meal_types = []
+        self.cursor.execute(f'SELECT * FROM {self.table_types}')
+        self.db.commit()
+        for row in self.cursor.fetchall():
+            meal_types.append(
+                MealType(
+                    id = row[0],
+                    name = row[1]
+                )
+            )
+        return meal_types

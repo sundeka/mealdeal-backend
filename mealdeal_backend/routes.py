@@ -21,3 +21,10 @@ def get_meals() -> Response:
     with Database() as db:
         meals = db.get_meals()
     return jsonify(meals)
+
+@app.get("/types")
+def get_types() -> Response:
+    types = []
+    with Database() as db:
+        types = db.get_types()
+    return jsonify(types)

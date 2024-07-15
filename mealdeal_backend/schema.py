@@ -16,3 +16,8 @@ class Meal:
     name: str
     description: str
     type: int
+
+@dataclass
+class MealType:
+    id: int
+    name: str
