@@ -1,6 +1,6 @@
 import pyodbc
 from typing import List
-from .schema import Food, Meal, MealType
+from .schema import Food, Meal, MealEvent, MealType
 
 driver = server = port = user = password = database = None
 
@@ -22,6 +22,7 @@ class Database:
         self.table_foods = "foods"
         self.table_meals = "meals"
         self.table_types = "meal_types"
+        self.table_meal_events = "meal_events"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -55,7 +56,6 @@ class Database:
         for row in self.cursor.fetchall():
             meals.append(
                 Meal(
-                    id = row[0],
                     meal_id = row[1],
                     name = row[2],
                     description = row[3],
@@ -76,3 +76,8 @@ class Database:
                 )
             )
         return meal_types
+    
+    def create_meal(self, meal: Meal, meal_events: List[MealEvent]):
+        self.cursor.execute(f'INSERT INTO {self.table_meals} (meal_id, name, description, type) VALUES (?, ?, ?, ?)', meal.tuplify())
+        self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
+        self.db.commit()

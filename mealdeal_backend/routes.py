@@ -1,5 +1,8 @@
-from flask import Flask, jsonify, Response
+from typing import List
+from flask import Flask, jsonify, Response, request
+from mealdeal_backend.schema import Meal, MealEvent
 from .db import Database
+import pyodbc
 
 app = Flask(__name__)
 
@@ -28,3 +31,30 @@ def get_types() -> Response:
     with Database() as db:
         types = db.get_types()
     return jsonify(types)
+
+@app.post("/create")
+def create_meal() -> Response:
+    meal = Meal(
+        meal_id = request.json["mealId"],
+        name = request.json["name"],
+        description = request.json["description"],
+        type = request.json["type"],
+    )
+
+    meal_events: List[tuple] = []
+    for entry in request.json["events"]:
+        event = MealEvent(
+            meal_id = meal.meal_id,
+            food_id = entry["foodId"],
+            amount = entry["amount"],
+        )
+        meal_events.append(event.tuplify())
+
+    with Database() as db:
+        try:
+            db.create_meal(meal, meal_events)
+        except pyodbc.ProgrammingError as e:
+            print(e)
+            return {"message": "Error"}, 500
+        
+    return {"message": "Accepted"}, 200

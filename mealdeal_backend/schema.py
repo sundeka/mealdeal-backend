@@ -11,13 +11,24 @@ class Food:
 
 @dataclass
 class Meal:
-    id: int
     meal_id: str
     name: str
     description: str
     type: int
 
+    def tuplify(self):
+        return (self.meal_id, self.name, self.description, self.type)
+
 @dataclass
 class MealType:
     id: int
     name: str
+
+@dataclass
+class MealEvent:
+    meal_id: str
+    food_id: str
+    amount: int
+
+    def tuplify(self):
+        return (self.meal_id, self.food_id, self.amount)
