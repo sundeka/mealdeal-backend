@@ -58,3 +58,17 @@ def create_meal() -> Response:
             return {"message": "Error"}, 500
         
     return {"message": "Accepted"}, 200
+
+@app.get("/events/meals/<id>")
+def get_meal_contents(id: str) -> Response:
+    meal = {}
+    with Database() as db:
+        meal_events_for_id = db.get_meal_events_by_id(id)
+        for food in meal_events_for_id:
+            name = db.get_food_name_by_food_id(food.food_id)
+            meal[food.food_id] = {
+                "foodId": food.food_id,
+                "name": name,
+                "amount": food.amount
+            }
+    return jsonify(meal)

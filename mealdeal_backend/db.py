@@ -81,3 +81,22 @@ class Database:
         self.cursor.execute(f'INSERT INTO {self.table_meals} (meal_id, name, description, type) VALUES (?, ?, ?, ?)', meal.tuplify())
         self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
         self.db.commit()
+
+    def get_meal_events_by_id(self, id: str) -> List[MealEvent]:
+        meal_events = []
+        self.cursor.execute(f'SELECT * FROM {self.table_meal_events} WHERE meal_id = ?', (id))
+        self.db.commit()
+        for row in self.cursor.fetchall():
+            meal_events.append(
+                MealEvent(
+                    meal_id=row[1],
+                    food_id=row[2],
+                    amount=row[3]
+                )
+            )
+        return meal_events
+    
+    def get_food_name_by_food_id(self, id: str) -> str | None:
+        self.cursor.execute(f'SELECT (name) FROM {self.table_foods} WHERE food_id = ?', (id))
+        self.db.commit()
+        return self.cursor.fetchone()[0]
