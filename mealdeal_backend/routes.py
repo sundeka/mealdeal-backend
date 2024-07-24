@@ -73,7 +73,7 @@ def get_meal_contents(id: str) -> Response:
             }
     return jsonify(meal)
 
-@app.delete("/delete/meal/<id>")
+@app.delete("/meals/<id>")
 def delete_meal(id: str) -> Response:
     with Database() as db:
         try:
