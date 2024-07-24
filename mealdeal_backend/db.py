@@ -100,3 +100,8 @@ class Database:
         self.cursor.execute(f'SELECT (name) FROM {self.table_foods} WHERE food_id = ?', (id))
         self.db.commit()
         return self.cursor.fetchone()[0]
+    
+    def delete_meal(self, id: str) -> None:
+        self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (id))
+        self.cursor.execute(f'DELETE FROM {self.table_meals} WHERE meal_id = ?', (id))
+        self.db.commit()

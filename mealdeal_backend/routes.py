@@ -72,3 +72,13 @@ def get_meal_contents(id: str) -> Response:
                 "amount": food.amount
             }
     return jsonify(meal)
+
+@app.delete("/delete/meal/<id>")
+def delete_meal(id: str) -> Response:
+    with Database() as db:
+        try:
+            db.delete_meal(id)
+        except pyodbc.ProgrammingError as e:
+            print(e)
+            return {"message": "Error"}, 500
+    return {"message": "Accepted"}, 200
