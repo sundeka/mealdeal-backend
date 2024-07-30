@@ -28,6 +28,12 @@
 
 <p>TBD</p>
 
+<h3 align="left">PUT /meals/(id)</h3>
+
+###
+
+<p>TBD</p>
+
 <h3 align="left">GET /types</h3>
 
 ###

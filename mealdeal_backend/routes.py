@@ -82,3 +82,21 @@ def delete_meal(id: str) -> Response:
             print(e)
             return {"message": "Error"}, 500
     return {"message": "Accepted"}, 200
+
+@app.put("/meals/<id>")
+def update_meal(id: str) -> Response:
+    meal_events: List[tuple] = []
+    for entry in request.json:
+        event = MealEvent(
+            meal_id = id,
+            food_id = entry["foodId"],
+            amount = entry["amount"],
+        )
+        meal_events.append(event.tuplify())
+    with Database() as db:
+        try:
+            db.update_meal(id, meal_events)
+        except pyodbc.ProgrammingError as e:
+            print(e)
+            return {"message": "Error"}, 500
+    return {"message": "Accepted"}, 200
