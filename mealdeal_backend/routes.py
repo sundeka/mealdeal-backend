@@ -6,10 +6,12 @@ import pyodbc
 
 app = Flask(__name__)
 
-@app.post("/auth")
-def authenticate() -> Response:
-    # TODO
-    return jsonify({"auth": True})
+@app.post("/login")
+def login() -> Response:
+    if not request.headers.get('Authorization'):
+        return {"message": "Unauthorized"}, 401
+    encoded_b64 = request.headers.get('Authorization')
+    return {"message": "Accepted"}, 200
 
 @app.get("/foods")
 def get_foods() -> Response:
@@ -100,3 +102,6 @@ def update_meal(id: str) -> Response:
             print(e)
             return {"message": "Error"}, 500
     return {"message": "Accepted"}, 200
+
+if __name__ == "__main__":
+    app.run(ssl_context='adhoc')
