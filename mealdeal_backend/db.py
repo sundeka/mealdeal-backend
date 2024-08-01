@@ -110,3 +110,6 @@ class Database:
         self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (id))
         self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
         self.db.commit()
+
+    def get_user_id_for_user_name(self, username: str):
+        return "foobar"

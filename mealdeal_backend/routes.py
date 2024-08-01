@@ -2,6 +2,7 @@ from typing import List
 from flask import Flask, jsonify, Response, request
 from mealdeal_backend.schema import Meal, MealEvent
 from .db import Database
+from .auth import generate_token, parse_b64
 import pyodbc
 
 app = Flask(__name__)
@@ -10,8 +11,16 @@ app = Flask(__name__)
 def login() -> Response:
     if not request.headers.get('Authorization'):
         return {"message": "Unauthorized"}, 401
-    encoded_b64 = request.headers.get('Authorization')
-    return {"message": "Accepted"}, 200
+    user_name = parse_b64(request.headers.get('Authorization'))
+    if user_name:
+        user_id = None
+        with Database() as db:
+            user_id = db.get_user_id_for_user_name(user_name)
+        if user_id:
+            jwt = generate_token(user_id, user_name)
+            return {"token": jwt}, 200
+        return {"message": "No user id found for username"}, 401
+    return {"message": "Invalid username"}, 401
 
 @app.get("/foods")
 def get_foods() -> Response:
