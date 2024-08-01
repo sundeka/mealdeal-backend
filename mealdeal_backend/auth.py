@@ -3,13 +3,11 @@ import re
 import base64
 import jwt
 from datetime import timedelta, datetime, timezone
+from dotenv import load_dotenv
 
-secret = "381836fe163039ab7bcd0a84bf54dded9fbd4269"
-algorithm = "HS256"
+load_dotenv("./.env")
 
 def generate_token(user_id: str, user_name: str) -> str:
-    #secret = () TODO: hae dotenvistä
-    #algorithm = () TODO: hae dotenvistä
     payload = {
         'user_id': user_id,
         'user_name': user_name,
@@ -17,8 +15,8 @@ def generate_token(user_id: str, user_name: str) -> str:
     }
     return jwt.encode(
         payload=payload, 
-        key=secret, 
-        algorithm=algorithm,
+        key=os.environ['SECRET'], 
+        algorithm=os.environ['ALGORITHM'],
         headers={
             "iss": "MealDeal"
         }
@@ -38,8 +36,8 @@ def is_permission(headers: dict) -> bool:
             try:
                 jwt.decode(
                     jwt=token,
-                    key=secret,
-                    algorithms=[algorithm]
+                    key=os.environ['SECRET'],
+                    algorithms=[os.environ['ALGORITHM']]
                 )
                 return True
             except (
