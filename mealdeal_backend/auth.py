@@ -24,6 +24,33 @@ def generate_token(user_id: str, user_name: str) -> str:
         }
     )
 
+def is_permission(headers: dict) -> bool:
+    """
+    headers: dict - Contains the Header block of the HTTP request
+
+    Endpoint safeguard. 
+    Checks the validity of the JWT token. Returns True if permission exists.
+    """
+    if headers.get('Authorization'):
+        match = re.search(r"Bearer\s+([A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+)", headers['Authorization'])
+        if match:
+            token = match.group(1)
+            try:
+                jwt.decode(
+                    jwt=token,
+                    key=secret,
+                    algorithms=[algorithm]
+                )
+                return True
+            except (
+                jwt.exceptions.DecodeError,
+                jwt.ExpiredSignatureError,
+                jwt.InvalidTokenError
+            ):
+                """Returns False"""
+                pass
+    return False
+
 def parse_b64(encoded_b64: str) -> str | None:
     """encoded_b64: str - Base64 string where the decoded format is <username>:<password>"""
     decoded_b64 = _decode_b64(encoded_b64)
