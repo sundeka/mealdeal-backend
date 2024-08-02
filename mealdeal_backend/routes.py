@@ -2,7 +2,7 @@ from typing import List
 from flask import Flask, jsonify, Response, request
 from mealdeal_backend.schema import Meal, MealEvent
 from .db import Database
-from .auth import generate_token, parse_b64, is_permission
+from .auth import generate_token, parse_b64, is_permission, parse_user_id_from_token
 import pyodbc
 
 app = Flask(__name__)
@@ -20,7 +20,10 @@ def login() -> Response:
             user_id = db.get_user_id(user_name, password)
         if user_id:
             jwt = generate_token(user_id, user_name)
-            return {"token": jwt}, 200
+            return {
+                "token": jwt,
+                "user_id": user_id
+                }, 200
     return {"message": "Invalid username or password."}, 401
 
 @app.get("/foods")
@@ -32,12 +35,12 @@ def get_foods() -> Response:
         return jsonify(foods)
     return {"message": "Unauthorized"}, 401 
 
-@app.get("/meals")
-def get_meals() -> Response:
+@app.get("/meals/<user_id>")
+def get_meals(user_id: str) -> Response:
     if is_permission(request.headers):
         meals = []
         with Database() as db:
-            meals = db.get_meals()
+            meals = db.get_meals(user_id)
         return jsonify(meals)
     return {"message": "Unauthorized"}, 401 
 
@@ -55,11 +58,11 @@ def create_meal() -> Response:
     if is_permission(request.headers):
         meal = Meal(
             meal_id = request.json["mealId"],
+            user_id = request.json["userId"],
             name = request.json["name"],
             description = request.json["description"],
             type = request.json["type"],
         )
-
         meal_events: List[tuple] = []
         for entry in request.json["events"]:
             event = MealEvent(
@@ -75,7 +78,6 @@ def create_meal() -> Response:
             except pyodbc.ProgrammingError as e:
                 print(e)
                 return {"message": "Error"}, 500
-            
         return {"message": "Accepted"}, 200
     return {"message": "Unauthorized"}, 401 
 
@@ -95,32 +97,34 @@ def get_meal_contents(id: str) -> Response:
         return jsonify(meal)
     return {"message": "Unauthorized"}, 401 
 
-@app.delete("/meals/<id>")
-def delete_meal(id: str) -> Response:
+@app.delete("/meals/<meal_id>")
+def delete_meal(meal_id: str) -> Response:
     if is_permission(request.headers):
+        user_id = parse_user_id_from_token(request.headers['Authorization'])
         with Database() as db:
             try:
-                db.delete_meal(id)
+                db.delete_meal(meal_id, user_id)
             except pyodbc.ProgrammingError as e:
                 print(e)
                 return {"message": "Error"}, 500
         return {"message": "Accepted"}, 200
     return {"message": "Unauthorized"}, 401 
 
-@app.put("/meals/<id>")
-def update_meal(id: str) -> Response:
+@app.put("/meals/<meal_id>")
+def update_meal(meal_id: str) -> Response:
     if is_permission(request.headers):
+        user_id = parse_user_id_from_token(request.headers['Authorization'])
         meal_events: List[tuple] = []
         for entry in request.json:
             event = MealEvent(
-                meal_id = id,
+                meal_id = meal_id,
                 food_id = entry["foodId"],
                 amount = entry["amount"],
             )
             meal_events.append(event.tuplify())
         with Database() as db:
             try:
-                db.update_meal(id, meal_events)
+                db.update_meal(user_id, meal_id, meal_events)
             except pyodbc.ProgrammingError as e:
                 print(e)
                 return {"message": "Error"}, 500

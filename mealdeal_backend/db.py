@@ -1,6 +1,7 @@
 import pyodbc
 import bcrypt
 from typing import List
+from .exceptions import DatabaseAuthException
 from .schema import Food, Meal, MealEvent, MealType
 
 driver = server = port = user = password = database = None
@@ -51,17 +52,18 @@ class Database:
                 )
         return foods
     
-    def get_meals(self) -> List[Meal]:
+    def get_meals(self, user_id: str) -> List[Meal]:
         meals = []
-        self.cursor.execute(f'SELECT * FROM {self.table_meals}')
+        self.cursor.execute(f'SELECT * FROM {self.table_meals} WHERE user_id = ?', (user_id))
         self.db.commit()
         for row in self.cursor.fetchall():
             meals.append(
                 Meal(
                     meal_id = row[1],
-                    name = row[2],
-                    description = row[3],
-                    type = row[4]
+                    user_id = row[2],
+                    name = row[3],
+                    description = row[4],
+                    type = row[5]
                 )
             )
         return meals
@@ -80,7 +82,7 @@ class Database:
         return meal_types
     
     def create_meal(self, meal: Meal, meal_events: List[MealEvent]):
-        self.cursor.execute(f'INSERT INTO {self.table_meals} (meal_id, name, description, type) VALUES (?, ?, ?, ?)', meal.tuplify())
+        self.cursor.execute(f'INSERT INTO {self.table_meals} (meal_id, user_id, name, description, type) VALUES (?, ?, ?, ?, ?)', meal.tuplify())
         self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
         self.db.commit()
 
@@ -103,15 +105,20 @@ class Database:
         self.db.commit()
         return self.cursor.fetchone()[0]
     
-    def delete_meal(self, id: str) -> None:
-        self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (id))
-        self.cursor.execute(f'DELETE FROM {self.table_meals} WHERE meal_id = ?', (id))
+    def delete_meal(self, meal_id: str, user_id: str) -> None:
+        self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (meal_id))
+        self.cursor.execute(f'DELETE FROM {self.table_meals} WHERE meal_id = ? AND user_id = ?', (meal_id, user_id))
         self.db.commit()
 
-    def update_meal(self, id: str, meal_events: List[MealEvent]):
-        self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (id))
-        self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
+    def update_meal(self, user_id: str, meal_id: str, meal_events: List[MealEvent]):
+        self.cursor.execute(f'SELECT * from {self.table_meals} where meal_id = ? AND user_id = ?', (meal_id, user_id))
         self.db.commit()
+        if self.cursor.fetchone():
+            self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (meal_id))
+            self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
+            self.db.commit()
+        else:
+            raise DatabaseAuthException(f"No match: user_id={user_id} meal_id={meal_id}")
 
     def get_user_id(self, username: str, password: str) -> str | None:
         """

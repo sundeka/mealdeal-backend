@@ -50,6 +50,16 @@ def is_permission(headers: dict) -> bool:
                 pass
     return False
 
+def parse_user_id_from_token(token: str) -> str:
+    """
+    Whenever this function is called, it must be assumed that `token` is in the form of `Bearer <token>`.
+
+    Always called after is_permission().
+    """
+    token = token.split()[1]
+    token_decoded = jwt.decode(jwt=token, key=os.environ['SECRET'], algorithms=[os.environ['ALGORITHM']])
+    return token_decoded['user_id']
+
 def parse_b64(encoded_b64: str) -> List[str] | None:
     """encoded_b64: str - Base64 string where the decoded format is <username>:<password>"""
     decoded_b64 = _decode_b64(encoded_b64)
