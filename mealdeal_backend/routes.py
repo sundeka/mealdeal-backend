@@ -22,7 +22,8 @@ def login() -> Response:
             jwt = generate_token(user_id, user_name)
             return {
                 "token": jwt,
-                "user_id": user_id
+                "user_id": user_id,
+                "username": user_name
                 }, 200
     return {"message": "Invalid username or password."}, 401
 
