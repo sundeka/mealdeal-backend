@@ -11,16 +11,17 @@ app = Flask(__name__)
 def login() -> Response:
     if not request.headers.get('Authorization'):
         return {"message": "Unauthorized"}, 401
-    user_name = parse_b64(request.headers.get('Authorization'))
-    if user_name:
+    credentials = parse_b64(request.headers.get('Authorization'))
+    if credentials:
         user_id = None
+        user_name = credentials[0]
+        password = credentials[1]
         with Database() as db:
-            user_id = db.get_user_id_for_user_name(user_name)
+            user_id = db.get_user_id(user_name, password)
         if user_id:
             jwt = generate_token(user_id, user_name)
             return {"token": jwt}, 200
-        return {"message": "No user id found for username"}, 401
-    return {"message": "Invalid username"}, 401
+    return {"message": "Invalid username or password."}, 401
 
 @app.get("/foods")
 def get_foods() -> Response:

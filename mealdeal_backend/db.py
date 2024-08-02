@@ -1,4 +1,5 @@
 import pyodbc
+import bcrypt
 from typing import List
 from .schema import Food, Meal, MealEvent, MealType
 
@@ -23,6 +24,7 @@ class Database:
         self.table_meals = "meals"
         self.table_types = "meal_types"
         self.table_meal_events = "meal_events"
+        self.table_users = "users"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -111,5 +113,18 @@ class Database:
         self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
         self.db.commit()
 
-    def get_user_id_for_user_name(self, username: str):
-        return "foobar"
+    def get_user_id(self, username: str, password: str) -> str | None:
+        """
+        Check if the user exists in the database.
+        Check given password against hash.
+        Return user_id (str) if exists, otherwise None.
+        """
+        self.cursor.execute(f'SELECT user_id, password FROM {self.table_users} WHERE username = ?', (username))
+        self.db.commit()
+        match = self.cursor.fetchone()
+        if match:
+            user_id = match[0]
+            hashed = match[1]
+            if bcrypt.checkpw(bytes(password, "utf-8"), bytes(hashed, "utf-8")):
+                return user_id
+        return None

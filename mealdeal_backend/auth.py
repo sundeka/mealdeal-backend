@@ -2,6 +2,7 @@ import os
 import re
 import base64
 import jwt
+from typing import List
 from datetime import timedelta, datetime, timezone
 from dotenv import load_dotenv
 
@@ -49,12 +50,12 @@ def is_permission(headers: dict) -> bool:
                 pass
     return False
 
-def parse_b64(encoded_b64: str) -> str | None:
+def parse_b64(encoded_b64: str) -> List[str] | None:
     """encoded_b64: str - Base64 string where the decoded format is <username>:<password>"""
     decoded_b64 = _decode_b64(encoded_b64)
     credentials = decoded_b64.split(":")
     if len(credentials) == 2:
-        return credentials[0]
+        return credentials
     return None
 
 def _decode_b64(encoded_b64: str) -> str:
