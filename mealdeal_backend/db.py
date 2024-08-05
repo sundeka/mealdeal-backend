@@ -144,6 +144,8 @@ class Database:
         if match:
             metadata.username = match[0]
             metadata.account_created = match[1]
+            if (metadata.account_created):
+                metadata.account_created = metadata.account_created.isoformat()
         self.cursor.execute(f'SELECT * FROM {self.table_meals} where user_id = ?', (id))
         self.db.commit()
         match = self.cursor.fetchall()

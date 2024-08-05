@@ -16,7 +16,7 @@
 
 <p>TBD</p>
 
-<h3 align="left">GET /metadata/<id></h3>
+<h3 align="left">GET /metadata/(id)</h3>
 
 ###
 

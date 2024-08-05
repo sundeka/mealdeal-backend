@@ -37,6 +37,6 @@ class MealEvent:
     
 @dataclass
 class UserMetadata:
-    username: str | None
-    account_created: datetime | None
-    meals_created: int | None
+    username: str
+    account_created: str
+    meals_created: int
