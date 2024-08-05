@@ -2,7 +2,7 @@ import pyodbc
 import bcrypt
 from typing import List
 from .exceptions import DatabaseAuthException
-from .schema import Food, Meal, MealEvent, MealType
+from .schema import Food, Meal, MealEvent, MealType, UserMetadata
 
 driver = server = port = user = password = database = None
 
@@ -135,3 +135,18 @@ class Database:
             if bcrypt.checkpw(bytes(password, "utf-8"), bytes(hashed, "utf-8")):
                 return user_id
         return None
+    
+    def get_metadata_for_user_id(self, id: str) -> UserMetadata:
+        metadata = UserMetadata(username=None, account_created=None, meals_created=None)
+        self.cursor.execute(f'SELECT username, created_at FROM {self.table_users} WHERE user_id = ?', (id))
+        self.db.commit()
+        match = self.cursor.fetchone()
+        if match:
+            metadata.username = match[0]
+            metadata.account_created = match[1]
+        self.cursor.execute(f'SELECT * FROM {self.table_meals} where user_id = ?', (id))
+        self.db.commit()
+        match = self.cursor.fetchall()
+        if match:
+            metadata.meals_created = len(match)
+        return metadata

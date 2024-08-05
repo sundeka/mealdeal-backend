@@ -10,6 +10,18 @@
 
 ###
 
+<h3 align="left">POST /login</h3>
+
+###
+
+<p>TBD</p>
+
+<h3 align="left">GET /metadata/<id></h3>
+
+###
+
+<p>TBD</p>
+
 <h3 align="left">GET /foods</h3>
 
 ###

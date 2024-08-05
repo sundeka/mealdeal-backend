@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 @dataclass
 class Food:
@@ -33,3 +34,9 @@ class MealEvent:
 
     def tuplify(self):
         return (self.meal_id, self.food_id, self.amount)
+    
+@dataclass
+class UserMetadata:
+    username: str | None
+    account_created: datetime | None
+    meals_created: int | None

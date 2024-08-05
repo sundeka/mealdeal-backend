@@ -23,9 +23,20 @@ def login() -> Response:
             return {
                 "token": jwt,
                 "user_id": user_id,
-                "username": user_name
                 }, 200
     return {"message": "Invalid username or password."}, 401
+
+@app.get("/metadata/<id>")
+def get_metadata(id: str) -> Response:
+    if (is_permission(request.headers)):
+        with Database() as db:
+            metadata = db.get_metadata_for_user_id(id)
+            return {
+                "username": metadata.username,
+                "account_created": metadata.account_created,
+                "meals_created": metadata.meals_created
+            }, 200
+    return {"message": "Unauthorized"}, 401
 
 @app.get("/foods")
 def get_foods() -> Response:
