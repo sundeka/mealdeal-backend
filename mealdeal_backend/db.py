@@ -138,7 +138,12 @@ class Database:
         return None
     
     def get_metadata_for_user_id(self, id: str) -> UserMetadata:
-        metadata = UserMetadata(username=None, account_created=None, meals_created=None)
+        metadata = UserMetadata(
+            username=None, 
+            account_created=None, 
+            meals_created=None, 
+            plans_created=None
+        )
         self.cursor.execute(f'SELECT username, created_at FROM {self.table_users} WHERE user_id = ?', (id))
         self.db.commit()
         match = self.cursor.fetchone()
@@ -150,8 +155,11 @@ class Database:
         self.cursor.execute(f'SELECT * FROM {self.table_meals} where user_id = ?', (id))
         self.db.commit()
         match = self.cursor.fetchall()
-        if match:
-            metadata.meals_created = len(match)
+        metadata.meals_created = len(match)
+        self.cursor.execute(f'SELECT * FROM {self.table_plans} where user_id = ?', (id))
+        self.db.commit()
+        match = self.cursor.fetchall()
+        metadata.plans_created = len(match)
         return metadata
     
     def create_plan(self, plan: Plan):

@@ -34,7 +34,8 @@ def get_metadata(id: str) -> Response:
             return {
                 "username": metadata.username,
                 "account_created": metadata.account_created,
-                "meals_created": metadata.meals_created
+                "meals_created": metadata.meals_created,
+                "plans_created": metadata.plans_created
             }, 200
     return {"message": "Unauthorized"}, 401
 

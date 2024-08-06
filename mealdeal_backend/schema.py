@@ -40,6 +40,7 @@ class UserMetadata:
     username: str
     account_created: str
     meals_created: int
+    plans_created: int
 
 @dataclass
 class Plan:
