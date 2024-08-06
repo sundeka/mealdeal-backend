@@ -2,7 +2,7 @@ import pyodbc
 import bcrypt
 from typing import List
 from .exceptions import DatabaseAuthException
-from .schema import Food, Meal, MealEvent, MealType, UserMetadata
+from .schema import Food, Meal, MealEvent, MealType, Plan, UserMetadata
 
 driver = server = port = user = password = database = None
 
@@ -26,6 +26,7 @@ class Database:
         self.table_types = "meal_types"
         self.table_meal_events = "meal_events"
         self.table_users = "users"
+        self.table_plans = "plans"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -152,3 +153,7 @@ class Database:
         if match:
             metadata.meals_created = len(match)
         return metadata
+    
+    def create_plan(self, plan: Plan):
+        self.cursor.execute(f'INSERT INTO {self.table_plans} (plan_id, name, user_id, description, length, created_at) VALUES (?, ?, ?, ?, ?, ?)', (plan.tuplify()))
+        self.db.commit()

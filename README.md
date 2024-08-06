@@ -34,6 +34,12 @@
 
 <p>TBD</p>
 
+<h3 align="left">POST /plans</h3>
+
+###
+
+<p>TBD</p>
+
 <h3 align="left">DELETE /meals/(id)</h3>
 
 ###

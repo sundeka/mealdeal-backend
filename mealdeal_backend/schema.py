@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from dateutil import parser
 
 @dataclass
 class Food:
@@ -40,3 +40,22 @@ class UserMetadata:
     username: str
     account_created: str
     meals_created: int
+
+@dataclass
+class Plan:
+    plan_id: str
+    name: str
+    user_id: str
+    description: str | None
+    length: int
+    created_at: str
+
+    def tuplify(self):
+        return (
+            self.plan_id,
+            self.name,
+            self.user_id,
+            self.description,
+            self.length,
+            parser.parse(self.created_at)
+        )
