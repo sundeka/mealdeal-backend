@@ -166,6 +166,28 @@ def get_meal_contents(id: str) -> Response:
         return jsonify(meal)
     return {"message": "Unauthorized"}, 401 
 
+@app.get("/plans/<id>")
+def get_plans(id: str) -> Response:
+    if is_permission(request.headers):
+        plans = []
+        with Database() as db:
+            try:
+                plans_for_user_id = db.get_plans(id)
+            except pyodbc.ProgrammingError as e:
+                print(e)
+                return {"message": "Error"}, 500
+            for plan in plans_for_user_id:
+                plan_json = {
+                    "planId": plan.plan_id,
+                    "name": plan.name,
+                    "description": plan.description,
+                    "length": plan.length,
+                    "createdAt": plan.created_at
+                }
+                plans.append(plan_json)
+        return jsonify(plans)
+    return {"message": "Unauthorized"}, 401 
+
 @app.get("/events/plans/<id>")
 def get_plan_events(id: str) -> Response:
     pass

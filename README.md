@@ -40,6 +40,12 @@
 
 <p>TBD</p>
 
+<h3 align="left">GET /plans/(id)</h3>
+
+###
+
+<p>TBD</p>
+
 <h3 align="left">DELETE /meals/(id)</h3>
 
 ###

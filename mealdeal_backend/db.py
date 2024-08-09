@@ -165,3 +165,20 @@ class Database:
     def create_plan(self, plan: Plan):
         self.cursor.execute(f'INSERT INTO {self.table_plans} (plan_id, name, user_id, description, length, created_at) VALUES (?, ?, ?, ?, ?, ?)', (plan.tuplify()))
         self.db.commit()
+
+    def get_plans(self, id: str) -> List[Plan]:
+        plans: List[Plan] = []
+        self.cursor.execute(f'SELECT plan_id, name, description, length, created_at FROM {self.table_plans} WHERE user_id = ?', (id))
+        self.db.commit()
+        for row in self.cursor.fetchall():
+            plans.append(
+                Plan(
+                    plan_id=row[0],
+                    name=row[1],
+                    user_id=id,
+                    description=row[2],
+                    length=row[3],
+                    created_at=row[4].isoformat()
+                )
+            )
+        return plans
