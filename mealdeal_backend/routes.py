@@ -139,7 +139,9 @@ def create_plan() -> Response:
             user_id=user_id,
             description=payload["description"],
             length=payload["length"],
-            created_at=payload["createdAt"]
+            created_at=payload["createdAt"],
+            starting_from=payload["startingFrom"],
+            is_continuous=not payload["length"]
         )
         with Database() as db:
             try:
@@ -182,7 +184,9 @@ def get_plans(id: str) -> Response:
                     "name": plan.name,
                     "description": plan.description,
                     "length": plan.length,
-                    "createdAt": plan.created_at
+                    "createdAt": plan.created_at,
+                    "startingFrom": plan.starting_from,
+                    "isContinous": plan.is_continuous
                 }
                 plans.append(plan_json)
         return jsonify(plans)

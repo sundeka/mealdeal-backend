@@ -48,8 +48,10 @@ class Plan:
     name: str
     user_id: str
     description: str | None
-    length: int
+    length: int | None
     created_at: str
+    starting_from: str | None
+    is_continuous: bool
 
     def tuplify(self):
         return (
@@ -58,5 +60,7 @@ class Plan:
             self.user_id,
             self.description,
             self.length,
-            parser.parse(self.created_at)
+            parser.parse(self.created_at),
+            parser.parse(self.starting_from) if self.starting_from else None,
+            self.is_continuous
         )

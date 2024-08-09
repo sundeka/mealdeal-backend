@@ -163,14 +163,17 @@ class Database:
         return metadata
     
     def create_plan(self, plan: Plan):
-        self.cursor.execute(f'INSERT INTO {self.table_plans} (plan_id, name, user_id, description, length, created_at) VALUES (?, ?, ?, ?, ?, ?)', (plan.tuplify()))
+        self.cursor.execute(f'INSERT INTO {self.table_plans} (plan_id, name, user_id, description, length, created_at, starting_from, is_continuous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (plan.tuplify()))
         self.db.commit()
 
     def get_plans(self, id: str) -> List[Plan]:
         plans: List[Plan] = []
-        self.cursor.execute(f'SELECT plan_id, name, description, length, created_at FROM {self.table_plans} WHERE user_id = ?', (id))
+        self.cursor.execute(f'SELECT plan_id, name, description, length, created_at, starting_from, is_continuous FROM {self.table_plans} WHERE user_id = ?', (id))
         self.db.commit()
         for row in self.cursor.fetchall():
+            starting_from = row[5]
+            if starting_from:
+                starting_from = starting_from.isoformat()
             plans.append(
                 Plan(
                     plan_id=row[0],
@@ -178,7 +181,9 @@ class Database:
                     user_id=id,
                     description=row[2],
                     length=row[3],
-                    created_at=row[4].isoformat()
+                    created_at=row[4].isoformat(),
+                    starting_from=starting_from,
+                    is_continous=row[5]
                 )
             )
         return plans
