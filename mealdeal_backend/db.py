@@ -183,7 +183,7 @@ class Database:
                     length=row[3],
                     created_at=row[4].isoformat(),
                     starting_from=starting_from,
-                    is_continous=row[5]
+                    is_continuous=True if row[6] == 1 else False
                 )
             )
         return plans
