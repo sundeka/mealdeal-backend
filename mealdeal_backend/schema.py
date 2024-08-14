@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List, Dict
 from dateutil import parser
 
 @dataclass
@@ -64,3 +65,25 @@ class Plan:
             parser.parse(self.starting_from) if self.starting_from else None,
             self.is_continuous
         )
+    
+@dataclass
+class PlanEvent:
+    plan_event_id: str
+    day: int
+    meal_id: str
+    time: str
+    meal_name: str
+    meal_type: str
+    meal_contents: List[dict[str, int]]
+
+    def jsonify(self):
+        # Follows the TypeScript naming convention
+        # `day` is omitted on purpose
+        return {
+            "planEventId": self.plan_event_id,
+            "mealId": self.meal_id,
+            "time": self.time,
+            "mealName": self.meal_name,
+            "mealType": self.meal_type,
+            "mealContents": self.meal_contents
+        }

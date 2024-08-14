@@ -75,3 +75,6 @@
 ###
 
 <p>TBD</p>
+
+
+<h3 align="left">GET /events/plans/(id)</h3>

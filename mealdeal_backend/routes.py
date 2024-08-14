@@ -194,7 +194,40 @@ def get_plans(id: str) -> Response:
 
 @app.get("/events/plans/<id>")
 def get_plan_events(id: str) -> Response:
-    pass
+    if is_permission(request.headers):
+        week_buckets = {
+            "monday": [],
+            "tuesday": [],
+            "wednesday": [],
+            "thursday": [],
+            "friday": [],
+            "saturday": [],
+            "sunday": [],
+        }
+        with Database() as db:
+            events = db.get_events_for_plan(
+                id,
+                request.args.get('startDate'),
+                request.args.get('endDate') 
+            )
+            for event in events:
+                match event.day:
+                    case 0:
+                        week_buckets["sunday"].append(event.jsonify())
+                    case 1:
+                        week_buckets["monday"].append(event.jsonify())
+                    case 2:
+                        week_buckets["tuesday"].append(event.jsonify())
+                    case 3:
+                        week_buckets["wednesday"].append(event.jsonify())
+                    case 4:
+                        week_buckets["thursday"].append(event.jsonify())
+                    case 5:
+                        week_buckets["friday"].append(event.jsonify())
+                    case 6:
+                        week_buckets["saturday"].append(event.jsonify())
+        return jsonify(week_buckets)
+    return {"message": "Unauthorized"}, 401 
 
 if __name__ == "__main__":
     app.run(ssl_context='adhoc')

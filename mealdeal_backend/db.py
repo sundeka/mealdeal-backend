@@ -2,7 +2,7 @@ import pyodbc
 import bcrypt
 from typing import List
 from .exceptions import DatabaseAuthException
-from .schema import Food, Meal, MealEvent, MealType, Plan, UserMetadata
+from .schema import Food, Meal, MealEvent, MealType, Plan, PlanEvent, UserMetadata
 
 driver = server = port = user = password = database = None
 
@@ -27,6 +27,7 @@ class Database:
         self.table_meal_events = "meal_events"
         self.table_users = "users"
         self.table_plans = "plans"
+        self.table_plan_events = "plan_events"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -187,3 +188,27 @@ class Database:
                 )
             )
         return plans
+    
+    def get_events_for_plan(self, id: str, start: str | None, end: str | None) -> List[PlanEvent]:
+        query = f'SELECT plan_event_id, day, time, meal_id FROM {self.table_plan_events} WHERE plan_id = ?'
+        if start and end:
+            query += " AND time BETWEEN ? AND ?"
+            self.cursor.execute(query, (id, start, end))
+        else:
+            self.cursor.execute(query, (id))
+        self.db.commit()
+        plan_events: List[PlanEvent] = []
+        for row in self.cursor.fetchall():
+            plan_events.append(
+                PlanEvent(
+                    plan_event_id=row[0],
+                    day=row[1],
+                    meal_id=row[3],
+                    time=row[2],
+                    meal_name=None,
+                    meal_type=None,
+                    meal_contents=[]
+                )
+            )
+        # TODO: hae ruokatiedot
+        return plan_events
