@@ -196,13 +196,13 @@ def get_plans(id: str) -> Response:
 def get_plan_events(id: str) -> Response:
     if is_permission(request.headers):
         week_buckets = {
-            "monday": [],
-            "tuesday": [],
-            "wednesday": [],
-            "thursday": [],
-            "friday": [],
-            "saturday": [],
-            "sunday": [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            0: [],
         }
         with Database() as db:
             events = db.get_events_for_plan(
@@ -211,21 +211,7 @@ def get_plan_events(id: str) -> Response:
                 request.args.get('endDate') 
             )
             for event in events:
-                match event.day:
-                    case 0:
-                        week_buckets["sunday"].append(event.jsonify())
-                    case 1:
-                        week_buckets["monday"].append(event.jsonify())
-                    case 2:
-                        week_buckets["tuesday"].append(event.jsonify())
-                    case 3:
-                        week_buckets["wednesday"].append(event.jsonify())
-                    case 4:
-                        week_buckets["thursday"].append(event.jsonify())
-                    case 5:
-                        week_buckets["friday"].append(event.jsonify())
-                    case 6:
-                        week_buckets["saturday"].append(event.jsonify())
+                week_buckets[event.day].append(event.jsonify())
         return jsonify(week_buckets)
     return {"message": "Unauthorized"}, 401 
 

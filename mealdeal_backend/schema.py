@@ -73,7 +73,7 @@ class PlanEvent:
     meal_id: str
     time: str
     meal_name: str
-    meal_type: str
+    meal_type: int
     meal_contents: List[dict[str, int]]
 
     def jsonify(self):
