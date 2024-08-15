@@ -67,7 +67,8 @@ class Plan:
         )
     
 @dataclass
-class PlanEvent:
+class TimelinePlanEvent:
+    # Data needed to properly display the item on the timeline
     plan_event_id: str
     day: int
     meal_id: str
@@ -87,3 +88,15 @@ class PlanEvent:
             "mealType": self.meal_type,
             "mealContents": self.meal_contents
         }
+    
+@dataclass
+class PlanEvent:
+    # Data needed to add a new plan event into plan_events
+    plan_event_id: str
+    plan_id: str
+    day: int
+    meal_id: str
+    time: str
+
+    def tuplify(self):
+        return (self.plan_event_id, self.plan_id, self.day, self.meal_id, self.time)

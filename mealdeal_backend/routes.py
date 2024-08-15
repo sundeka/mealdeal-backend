@@ -1,6 +1,6 @@
 from typing import List
 from flask import Flask, jsonify, Response, request
-from mealdeal_backend.schema import Meal, MealEvent, Plan
+from mealdeal_backend.schema import Meal, MealEvent, Plan, PlanEvent
 from .db import Database
 from .auth import generate_token, parse_b64, is_permission, parse_user_id_from_token
 import pyodbc
@@ -213,6 +213,32 @@ def get_plan_events(id: str) -> Response:
             for event in events:
                 week_buckets[event.day].append(event.jsonify())
         return jsonify(week_buckets)
+    return {"message": "Unauthorized"}, 401 
+
+@app.post("/events/plans/<id>")
+def add_plan_event(id: str) -> Response:
+    # id = plan_id (not plan_event_id, which is provided in the payload)
+    if is_permission(request.headers):
+        payload = request.json
+        plan_event = PlanEvent(
+            plan_event_id=payload["planEventId"],
+            plan_id=id,
+            day=payload["day"],
+            meal_id=payload["mealId"],
+            time=payload["time"],
+        )
+        with Database() as db:
+            db.add_plan_event(plan_event)
+        return {"message": "OK"}, 200
+    return {"message": "Unauthorized"}, 401 
+
+@app.delete("/events/plans/<id>")
+def delete_plan_event(id: str) -> Response:
+    # id = plan_id (not plan_event_id, which is provided in the payload)
+    if is_permission(request.headers):
+        with Database() as db:
+            db.delete_plan_event(request.args.get("planEventId"))
+        return {"message": "OK"}, 200
     return {"message": "Unauthorized"}, 401 
 
 if __name__ == "__main__":

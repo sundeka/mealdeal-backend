@@ -76,5 +76,20 @@
 
 <p>TBD</p>
 
-
 <h3 align="left">GET /events/plans/(id)</h3>
+
+###
+
+<p>TBD</p>
+
+<h3 align="left">POST /events/plans/(id)</h3>
+
+###
+
+<p>TBD</p>
+
+<h3 align="left">DELETE /events/plans/(id)</h3>
+
+###
+
+<p>TBD</p>

@@ -2,7 +2,7 @@ import pyodbc
 import bcrypt
 from typing import List
 from .exceptions import DatabaseAuthException
-from .schema import Food, Meal, MealEvent, MealType, Plan, PlanEvent, UserMetadata
+from .schema import Food, Meal, MealEvent, MealType, Plan, PlanEvent, TimelinePlanEvent, UserMetadata
 
 driver = server = port = user = password = database = None
 
@@ -189,7 +189,7 @@ class Database:
             )
         return plans
     
-    def get_events_for_plan(self, id: str, start: str | None, end: str | None) -> List[PlanEvent]:
+    def get_events_for_plan(self, id: str, start: str | None, end: str | None) -> List[TimelinePlanEvent]:
         query = f'SELECT plan_event_id, day, time, meal_id FROM {self.table_plan_events} WHERE plan_id = ?'
         if start and end:
             query += " AND time BETWEEN ? AND ?"
@@ -197,10 +197,10 @@ class Database:
         else:
             self.cursor.execute(query, (id))
         self.db.commit()
-        plan_events: List[PlanEvent] = []
+        plan_events: List[TimelinePlanEvent] = []
         for row in self.cursor.fetchall():
             plan_events.append(
-                PlanEvent(
+                TimelinePlanEvent(
                     plan_event_id=row[0],
                     day=row[1],
                     meal_id=row[3],
@@ -212,3 +212,11 @@ class Database:
             )
         # TODO: hae ruokatiedot
         return plan_events
+    
+    def add_plan_event(self, plan_event: PlanEvent):
+        self.cursor.execute(f"INSERT INTO {self.table_plan_events} (plan_event_id, plan_id, day, meal_id, time) VALUES (?, ?, ?, ?, ?)", plan_event.tuplify())
+        self.db.commit()
+
+    def delete_plan_event(self, plan_event_id: str):
+        self.cursor.execute(f"DELETE FROM {self.table_plan_events} WHERE plan_event_id = ?", (plan_event_id))
+        self.db.commit()
