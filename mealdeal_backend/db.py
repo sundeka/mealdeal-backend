@@ -168,6 +168,11 @@ class Database:
         self.cursor.execute(f'INSERT INTO {self.table_plans} (plan_id, name, user_id, description, length, created_at, starting_from, is_continuous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (plan.tuplify()))
         self.db.commit()
 
+    def delete_plan(self, plan_id: str):
+        self.cursor.execute(f'DELETE FROM {self.table_plan_events} WHERE plan_id = ?', (plan_id))
+        self.cursor.execute(f'DELETE FROM {self.table_plans} WHERE plan_id = ?', (plan_id))
+        self.db.commit()
+
     def get_plans(self, id: str) -> List[Plan]:
         plans: List[Plan] = []
         self.cursor.execute(f'SELECT plan_id, name, description, length, created_at, starting_from, is_continuous FROM {self.table_plans} WHERE user_id = ?', (id))

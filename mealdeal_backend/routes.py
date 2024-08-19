@@ -152,6 +152,14 @@ def create_plan() -> Response:
         return {"name": payload["name"]}, 200
     return {"message": "Unauthorized"}, 401
 
+@app.delete("/plans/<id>")
+def delete_plan(id: str) -> Response:
+    if is_permission(request.headers):
+        with Database() as db:
+            db.delete_plan(id)
+        return {"message": "Accepted"}, 200
+    return {"message": "Unauthorized"}, 401
+
 @app.get("/events/meals/<id>")
 def get_meal_contents(id: str) -> Response:
     if is_permission(request.headers):
