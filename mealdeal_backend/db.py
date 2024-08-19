@@ -210,8 +210,19 @@ class Database:
                 meal_metadata_for_meal_id[meal_id] = {
                     "meal_name": result[0],
                     "meal_type": result[1],
-                    "meal_contents": [] # TODO: join in query
+                    "meal_contents": []
                 }
+                query = f"""
+                    SELECT foods.name, meal_events.amount
+                    FROM {self.table_meal_events}
+                    INNER JOIN {self.table_foods} ON meal_events.food_id = foods.food_id
+                    WHERE meal_events.meal_id = ?
+                """
+                self.cursor.execute(query, (meal_id))
+                self.db.commit()
+                results = self.cursor.fetchall()
+                for food_row in results:
+                    meal_metadata_for_meal_id[meal_id]["meal_contents"].append({food_row[0]: food_row[1]})
             plan_events.append(
                 TimelinePlanEvent(
                     plan_event_id=row[0],
