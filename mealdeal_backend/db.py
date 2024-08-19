@@ -197,20 +197,32 @@ class Database:
         else:
             self.cursor.execute(query, (id))
         self.db.commit()
+        meal_metadata_for_meal_id = {}
         plan_events: List[TimelinePlanEvent] = []
         for row in self.cursor.fetchall():
+            meal_id = row[3]
+            if not meal_metadata_for_meal_id.get(meal_id):
+                # Only search meal data for a single id ONCE (avoid unnecessary search operations)
+                query = f'SELECT name, type FROM {self.table_meals} WHERE meal_id = ?'
+                self.cursor.execute(query, (meal_id))
+                self.db.commit()
+                result = self.cursor.fetchone()
+                meal_metadata_for_meal_id[meal_id] = {
+                    "meal_name": result[0],
+                    "meal_type": result[1],
+                    "meal_contents": [] # TODO: join in query
+                }
             plan_events.append(
                 TimelinePlanEvent(
                     plan_event_id=row[0],
                     day=row[1],
-                    meal_id=row[3],
+                    meal_id=meal_id,
                     time=row[2],
-                    meal_name=None,
-                    meal_type=None,
-                    meal_contents=[]
+                    meal_name=meal_metadata_for_meal_id.get(meal_id)["meal_name"],
+                    meal_type=meal_metadata_for_meal_id.get(meal_id)["meal_type"],
+                    meal_contents=meal_metadata_for_meal_id.get(meal_id)["meal_contents"]
                 )
             )
-        # TODO: hae ruokatiedot
         return plan_events
     
     def add_plan_event(self, plan_event: PlanEvent):
