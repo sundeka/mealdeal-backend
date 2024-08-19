@@ -110,6 +110,7 @@ class Database:
     def delete_meal(self, meal_id: str, user_id: str) -> None:
         self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (meal_id))
         self.cursor.execute(f'DELETE FROM {self.table_meals} WHERE meal_id = ? AND user_id = ?', (meal_id, user_id))
+        self.cursor.execute(f'DELETE FROM {self.table_plan_events} WHERE meal_id = ?', (meal_id))
         self.db.commit()
 
     def update_meal(self, user_id: str, meal_id: str, meal_events: List[MealEvent]):
