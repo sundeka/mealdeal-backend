@@ -249,5 +249,12 @@ def delete_plan_event(id: str) -> Response:
         return {"message": "OK"}, 200
     return {"message": "Unauthorized"}, 401 
 
+@app.get("/categories")
+def get_food_categories() -> Response:
+    if is_permission(request.headers):
+        with Database() as db:
+            return jsonify(db.get_food_categories())
+    return {"message": "Unauthorized"}, 401
+
 if __name__ == "__main__":
     app.run(ssl_context='adhoc')

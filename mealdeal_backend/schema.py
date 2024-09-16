@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List
 from dateutil import parser
 
 @dataclass
@@ -7,9 +7,19 @@ class Food:
     id: int
     food_id: str
     name: str
-    calories: int
-    protein: int
-    carbs: int
+    category: int
+    calories: float
+    fat: float
+    fat_saturated: float
+    carbs: float
+    fiber: float
+    protein: float
+    salt: float
+    calories_ri: float
+    fat_ri: float
+    fat_saturated_ri: float
+    carbs_ri: float
+    protein_ri: float
 
 @dataclass
 class Meal:
@@ -100,3 +110,8 @@ class PlanEvent:
 
     def tuplify(self):
         return (self.plan_event_id, self.plan_id, self.day, self.meal_id, self.time)
+    
+@dataclass
+class FoodCategory:
+    id: int
+    name: str

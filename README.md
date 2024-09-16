@@ -99,3 +99,9 @@
 ###
 
 <p>TBD</p>
+
+<h3 align="left">GET /categories</h3>
+
+###
+
+<p>TBD</p>

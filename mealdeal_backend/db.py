@@ -3,7 +3,7 @@ import bcrypt
 import os
 from typing import List
 from .exceptions import DatabaseAuthException
-from .schema import Food, Meal, MealEvent, MealType, Plan, PlanEvent, TimelinePlanEvent, UserMetadata
+from .schema import Food, FoodCategory, Meal, MealEvent, MealType, Plan, PlanEvent, TimelinePlanEvent, UserMetadata
 
 driver = server = port = user = password = database = None
 
@@ -39,6 +39,7 @@ class Database:
         self.table_users = "users"
         self.table_plans = "plans"
         self.table_plan_events = "plan_events"
+        self.table_food_categories = "food_categories"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
@@ -58,9 +59,19 @@ class Database:
                         id = row[0],
                         food_id = row[1],
                         name = row[2],
-                        calories = row[3],
-                        protein = row[4],
-                        carbs = row[5]
+                        category = row[3],
+                        calories = float(row[4]),
+                        fat = float(row[5]),
+                        fat_saturated = float(row[6]),
+                        carbs = float(row[7]),
+                        fiber = float(row[8]),
+                        protein = float(row[9]),
+                        salt = float(row[10]),
+                        calories_ri = float(row[11]),
+                        fat_ri = float(row[12]),
+                        fat_saturated_ri = float(row[13]),
+                        carbs_ri = float(row[14]),
+                        protein_ri = float(row[15]),
                     )
                 )
         return foods
@@ -260,3 +271,16 @@ class Database:
     def delete_plan_event(self, plan_event_id: str):
         self.cursor.execute(f"DELETE FROM {self.table_plan_events} WHERE plan_event_id = ?", (plan_event_id))
         self.db.commit()
+
+    def get_food_categories(self) -> List[FoodCategory]:
+        self.cursor.execute(f"SELECT * FROM {self.table_food_categories}")
+        self.db.commit()
+        cats = []
+        for row in self.cursor.fetchall():
+            cats.append(
+                FoodCategory(
+                    id=row[0],
+                    name=row[1]
+                )
+            )
+        return cats
