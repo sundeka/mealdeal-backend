@@ -69,6 +69,7 @@ def get_types() -> Response:
 @app.post("/create")
 def create_meal() -> Response:
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         meal = Meal(
             meal_id = request.json["mealId"],
             user_id = request.json["userId"],
@@ -97,6 +98,7 @@ def create_meal() -> Response:
 @app.delete("/meals/<meal_id>")
 def delete_meal(meal_id: str) -> Response:
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         user_id = parse_user_id_from_token(request.headers['Authorization'])
         with Database() as db:
             try:
@@ -110,6 +112,7 @@ def delete_meal(meal_id: str) -> Response:
 @app.put("/meals/<meal_id>")
 def update_meal(meal_id: str) -> Response:
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         user_id = parse_user_id_from_token(request.headers['Authorization'])
         meal_events: List[tuple] = []
         for entry in request.json:
@@ -131,6 +134,7 @@ def update_meal(meal_id: str) -> Response:
 @app.post("/plans")
 def create_plan() -> Response:
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         user_id = parse_user_id_from_token(request.headers['Authorization'])
         payload = request.json
         plan = Plan(
@@ -155,6 +159,7 @@ def create_plan() -> Response:
 @app.delete("/plans/<id>")
 def delete_plan(id: str) -> Response:
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         with Database() as db:
             db.delete_plan(id)
         return {"message": "Accepted"}, 200
@@ -227,6 +232,7 @@ def get_plan_events(id: str) -> Response:
 def add_plan_event(id: str) -> Response:
     # id = plan_id (not plan_event_id, which is provided in the payload)
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         payload = request.json
         plan_event = PlanEvent(
             plan_event_id=payload["planEventId"],
@@ -244,6 +250,7 @@ def add_plan_event(id: str) -> Response:
 def delete_plan_event(id: str) -> Response:
     # id = plan_id (not plan_event_id, which is provided in the payload)
     if is_permission(request.headers):
+        return {"message": "POST, PUT and DELETE operations are not allowed in the demo version!"}, 401
         with Database() as db:
             db.delete_plan_event(request.args.get("planEventId"))
         return {"message": "OK"}, 200
