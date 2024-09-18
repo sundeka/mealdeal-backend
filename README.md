@@ -10,8 +10,8 @@ Credentials are passed in the `Authorization` header in Base64 format.
 
 If the credentials can be validated, the following JSON response is returned:
 
-* token (string)
-* user_id (string)
+* token: str
+* user_id: str
 
 ```yaml
 {
@@ -24,100 +24,133 @@ If the credentials can be validated, the following JSON response is returned:
 
 Based on the user's unique ID, return the following information about the user:
 
-* username (string)
-* account_created (string)
-* meals_created (integer)
-* plans_created (integer)
+* username: str
+* account_created: str
+* meals_created: int
+* plans_created: int
 
 ```yaml
 {
     "username": "<username>",
     "account_created": "<date in ISO-format>",
-    "meals_created": "<# of meals created by user>",
-    "plans_created": "<# of plans created by user>",
+    "meals_created": 0,
+    "plans_created": 0,
 }
 ```
 
-<h3 align="left">GET /foods</h3>
+### GET /foods
 
-###
+Returns all the available foods from the database.
 
-<p>TBD</p>
+* id: int
+* food_id: str
+* name: str
+* category: int
+* calories: float
+* fat: float
+* fat_saturated: float
+* carbs: float
+* fiber: float
+* protein: float
+* salt: float
+* calories_ri: float
+* fat_ri: float
+* fat_saturated_ri: float
+* carbs_ri: float
+* protein_ri: float
 
-<h3 align="left">GET /meals</h3>
+```yaml
+[
+    {
+        "id": 0,
+        "food_id": "foo-bar-xyz",
+        ...
+    },
+    {
+        ...
+    }
+]
+```
 
-###
+### GET /types
 
-<p>TBD</p>
+Return all meal types.
 
-<h3 align="left">POST /plans</h3>
+* id: int
+* name: str
 
-###
+```yaml
+[
+    {
+        "id": "0",
+        "name": "<id of food>",
+    },
+    {
+        ...
+    }
+]
+```
 
-<p>TBD</p>
+### GET /meals/{user_id}
 
-<h3 align="left">GET /plans/(id)</h3>
+Return all meals for a single user ID.
 
-###
+* meal_id: str
+* user_id: str
+* name: str
+* description: str
+* type: int
 
-<p>TBD</p>
+```yaml
+[
+    {
+        "meal_id": "meal-foo-bar-xyz",
+        "user_id": "user-foo-bar-xyz",
+        ...
+    },
+    {
+        ...
+    }
+]
+```
 
-<h3 align="left">DELETE /plans/(id)</h3>
+### GET /categories
 
-###
+Return all food categories.
 
-<p>TBD</p>
+* id: int
+* name: str
 
-<h3 align="left">DELETE /meals/(id)</h3>
-
-###
-
-<p>TBD</p>
-
-<h3 align="left">PUT /meals/(id)</h3>
-
-###
-
-<p>TBD</p>
-
-<h3 align="left">GET /types</h3>
-
-###
-
-<p>TBD</p>
+```yaml
+[
+    {
+        "id": 1,
+        "name": "Berries",
+    },
+    {
+        ...
+    }
+]
+```
 
 <h3 align="left">POST /create</h3>
 
-###
+<h3 align="left">PUT /meals/(id)</h3>
 
-<p>TBD</p>
+<h3 align="left">DELETE /meals/(id)</h3>
+
+
+<h3 align="left">POST /plans</h3>
+
+<h3 align="left">GET /plans/(id)</h3>
+
+<h3 align="left">DELETE /plans/(id)</h3>
+
 
 <h3 align="left">GET /events/meals/(id)</h3>
 
-###
-
-<p>TBD</p>
-
 <h3 align="left">GET /events/plans/(id)</h3>
-
-###
-
-<p>TBD</p>
 
 <h3 align="left">POST /events/plans/(id)</h3>
 
-###
-
-<p>TBD</p>
-
 <h3 align="left">DELETE /events/plans/(id)</h3>
-
-###
-
-<p>TBD</p>
-
-<h3 align="left">GET /categories</h3>
-
-###
-
-<p>TBD</p>
