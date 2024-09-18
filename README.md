@@ -4,6 +4,8 @@ This repository contains the code for MealDeal's REST API. It is written in Pyth
 
 ## Endpoints
 
+**NOTE:** without a valid JSON Web Token in the request header, all endpoints except `/login` return a `401 Unauthorized` HTTP response!
+ 
 ### POST /login
 
 Credentials are passed in the `Authorization` header in Base64 format.
@@ -133,24 +135,215 @@ Return all food categories.
 ]
 ```
 
-<h3 align="left">POST /create</h3>
+### POST /create
 
-<h3 align="left">PUT /meals/(id)</h3>
+Create a new meal.
 
-<h3 align="left">DELETE /meals/(id)</h3>
+Expects the following payload:
 
+* mealId: str
+* userId: str
+* name: str
+* description: str (optional, can be an empty string)
+* type: int
+* events: List
 
-<h3 align="left">POST /plans</h3>
+```yaml
+{
+    "mealId": "meal-uuid-foo-bar",
+    "userId": "user-uuid-foo-bar",
+    "name": "my meal",
+    "description": "",
+    "type": 2,
+    "events": [
+        {
+            "mealId": "meal-uuid-foo-bar",
+            "foodId": "food-uuid-foo-bar",
+            "amount": 150
+        },
+        {
+            ...
+        }  
+    ]
+}
+```
 
-<h3 align="left">GET /plans/(id)</h3>
+### PUT /meals/{id}
 
-<h3 align="left">DELETE /plans/(id)</h3>
+Updates an existing meal by deleting all pre-existing meal items and replacing them with new ones. 
 
+Expects the user's ID in the `Authorization` header, while the meal ID is provided in the URI.
 
-<h3 align="left">GET /events/meals/(id)</h3>
+Expects the following items provided in a JSON array:
 
-<h3 align="left">GET /events/plans/(id)</h3>
+* mealId: str
+* foodId: str
+* amount: int
 
-<h3 align="left">POST /events/plans/(id)</h3>
+```yaml
+{
+    [
+        {
+            "mealId": "meal-uuid-foo-bar",
+            "foodId": "food-uuid-foo-bar",
+            "amount": 150
+        },
+        {
+            ...
+        }
+    ]
+}
+```
 
-<h3 align="left">DELETE /events/plans/(id)</h3>
+### DELETE /meals/{meal_id}
+
+Delete a meal based on its ID.
+
+Expects user ID to be provided in the `Authorization` header.
+
+### POST /plans
+
+Create a new meal plan.
+
+Expects user ID to be provided in the `Authorization` header.
+
+In addition, expects the following payload:
+
+* planId: str
+* name: str
+* description: str (optional, can be an empty string)
+* length: int | None (continous plans don't have a length)
+* createdAt: str
+* startingFrom: str
+* isContinuous: bool
+
+```yaml
+{
+    "planId": "plan-uuid-foo-bar",
+    "name": "My plan",
+    "description": "My new plan.",
+    "length": 0,
+    "createdAt": "<ISOFormat date>",
+    "startingFrom": "<ISOFormat date>",
+    "isContinous": true
+}
+```
+
+### GET /plans/{id}
+
+Returns all plans for a given user ID as a JSON array.
+
+* planId: str
+* name: str
+* description: str (optional, can be an empty string)
+* length: int | None (continous plans don't have a length)
+* createdAt: str
+* startingFrom: str
+* isContinuous: bool
+
+```yaml
+[
+    {
+        "planId": "plan-uuid-foo-bar",
+        "name": "My plan",
+        "description": "My new plan.",
+        "length": 0,
+        "createdAt": "<ISOFormat date>",
+        "startingFrom": "<ISOFormat date>",
+        "isContinous": true
+    },
+    {
+        ...
+    }
+]
+```
+
+### DELETE /plans/{id}
+
+Delete a meal plan by plan ID.
+
+### GET /events/meals/{id}
+
+Given a meal ID, return the individual foods that comprise it.
+
+Returns all food data in a JSON array.
+
+* foodId: str
+* name: str
+* amount: int
+
+```yaml
+[
+    {
+        "foodId": "food-uuid-foo-bar",
+        "name": "Blueberry",
+        "amount": 150
+    },
+    {
+        ...
+    }
+]
+```
+
+### GET /events/plans/{id}
+
+Given a plan ID and start/end date, return all individual meal events for said plan and timespan.
+
+Expects a start date and an end date to be provided in the request parameters in ISO format as in:
+
+`/events/plans/<planId>?startDate=1970-01-01T00:00:00+00:00&endDate=1970-01-06T23:59:00+00:00`
+
+Returns all events for the provided 7-day span as a JSON object:
+
+An individual entry has the following structure:
+
+* plan_event_id: str
+* plan_id: str
+* day: int
+* meal_id: str
+* time: str
+
+The actual response has the following format **without** the keys:
+
+```yaml
+1: [
+    {
+        "plan_event_uuid-foo-bar",
+        "plan_uuid-foo-bar",
+        1,
+        "meal-uuid-foo-bar",
+        "1970-01-01T06:00:00+00:00"
+    },
+    {
+        ...
+    }
+],
+2: [
+    ...
+]
+...
+6: [
+    ...
+]
+0: [
+    ...
+]
+```
+
+### POST /events/plans/{id}
+
+Insert a new meal event into a plan, given the plan ID.
+
+Expects the following payload:
+
+* plan_event_id: str (any randomly generated UUID)
+* plan_id: str
+* day: int
+* meal_id: str
+* time: str (in ISOFormat)
+
+### DELETE /events/plans/{id}
+
+Delete a meal event from a plan, given the plan ID.
+
+Expects `planEventId` to be provided in the request parameters.
