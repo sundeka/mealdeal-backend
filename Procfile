@@ -1,1 +1,0 @@
-web: gunicorn mealdeal_backend.routes:app
