@@ -7,6 +7,10 @@ import pyodbc
 
 app = Flask(__name__)
 
+@app.get("/")
+def default() -> Response:
+    return {"message": "MealDeal backend successfully deployed!"}, 200
+
 @app.post("/login")
 def login() -> Response:
     if not request.headers.get('Authorization'):
