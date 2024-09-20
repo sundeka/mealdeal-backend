@@ -1,8 +1,8 @@
 from typing import List
 from flask import Flask, jsonify, Response, request
 from mealdeal_backend.schema import Meal, MealEvent, Plan, PlanEvent
-from .db import Database
-from .auth import generate_token, parse_b64, is_permission, parse_user_id_from_token
+from mealdeal_backend.db import Database
+from mealdeal_backend.auth import generate_token, parse_b64, is_permission, parse_user_id_from_token
 import pyodbc
 
 app = Flask(__name__)
