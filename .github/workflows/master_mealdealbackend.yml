@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'mealdealbackend'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A3589322BB07439F9B171F06BA66D2F6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4E3432F439C24CF78D5338B50FCB5553 }}
