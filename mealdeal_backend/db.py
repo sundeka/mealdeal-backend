@@ -1,11 +1,11 @@
 import pyodbc
 import bcrypt
 import os
-from dotenv import load_dotenv
 from typing import List
 from .exceptions import DatabaseAuthException
 from .schema import Food, FoodCategory, Meal, MealEvent, MealType, Plan, PlanEvent, TimelinePlanEvent, UserMetadata
 
+connection_string = None
 try:
     driver = os.environ['DRIVER']
     server = os.environ['SERVER']
@@ -15,14 +15,7 @@ try:
     database = os.environ['DATABASE']
     connection_string = f'Driver={driver};Server={server},{port};Database={database};Uid={user};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 except KeyError:
-    load_dotenv()
-    driver = os.environ['DRIVER']
-    server = os.environ['SERVER']
-    port = os.environ['PORT']
-    user = os.environ['USER']
-    password = os.environ['PASSWORD']
-    database = os.environ['DATABASE']
-    connection_string = f'DRIVER={driver};SERVER={server};PORT={port};UID={user};PWD={password};DATABASE={database}'
+    print("Could not read one of the environment variables!")
 
 class Database:
     def __init__(self):
@@ -118,7 +111,7 @@ class Database:
             )
         return meal_events
     
-    def get_food_name_by_food_id(self, id: str) -> str | None:
+    def get_food_name_by_food_id(self, id: str) -> str:
         self.cursor.execute(f'SELECT (name) FROM {self.table_foods} WHERE food_id = ?', (id))
         self.db.commit()
         return self.cursor.fetchone()[0]
@@ -139,7 +132,7 @@ class Database:
         else:
             raise DatabaseAuthException(f"No match: user_id={user_id} meal_id={meal_id}")
 
-    def get_user_id(self, username: str, password: str) -> str | None:
+    def get_user_id(self, username: str, password: str) -> str:
         """
         Check if the user exists in the database.
         Check given password against hash.
@@ -211,7 +204,7 @@ class Database:
             )
         return plans
     
-    def get_events_for_plan(self, id: str, start: str | None, end: str | None) -> List[TimelinePlanEvent]:
+    def get_events_for_plan(self, id: str, start: str, end: str) -> List[TimelinePlanEvent]:
         query = f'SELECT plan_event_id, day, time, meal_id FROM {self.table_plan_events} WHERE plan_id = ?'
         if start and end:
             query += " AND time BETWEEN ? AND ?"

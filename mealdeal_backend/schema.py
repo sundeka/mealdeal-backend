@@ -58,10 +58,10 @@ class Plan:
     plan_id: str
     name: str
     user_id: str
-    description: str | None
-    length: int | None
+    description: str
+    length: int
     created_at: str
-    starting_from: str | None
+    starting_from: str
     is_continuous: bool
 
     def tuplify(self):

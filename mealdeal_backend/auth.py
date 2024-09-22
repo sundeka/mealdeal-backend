@@ -60,7 +60,7 @@ def parse_user_id_from_token(token: str) -> str:
     token_decoded = jwt.decode(jwt=token, key=os.environ['SECRET'], algorithms=[os.environ['ALGORITHM']])
     return token_decoded['user_id']
 
-def parse_b64(encoded_b64: str) -> List[str] | None:
+def parse_b64(encoded_b64: str) -> List[str]:
     """encoded_b64: str - Base64 string where the decoded format is <username>:<password>"""
     decoded_b64 = _decode_b64(encoded_b64)
     credentials = decoded_b64.split(":")
