@@ -1,18 +1,28 @@
 import pyodbc
 import bcrypt
 import os
+from dotenv import load_dotenv
 from typing import List
 from .exceptions import DatabaseAuthException
 from .schema import Food, FoodCategory, Meal, MealEvent, MealType, Plan, PlanEvent, TimelinePlanEvent, UserMetadata
 
-driver = os.environ['DRIVER']
-server = os.environ['SERVER']
-port = os.environ['PORT']
-user = os.environ['USER']
-password = os.environ['PASSWORD']
-database = os.environ['DATABASE']
-
-connection_string = f'Driver={driver};Server={server},{port};Database={database};Uid={user};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+try:
+    driver = os.environ['DRIVER']
+    server = os.environ['SERVER']
+    port = os.environ['PORT']
+    user = os.environ['USER']
+    password = os.environ['PASSWORD']
+    database = os.environ['DATABASE']
+    connection_string = f'Driver={driver};Server={server},{port};Database={database};Uid={user};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+except KeyError:
+    load_dotenv()
+    driver = os.environ['DRIVER']
+    server = os.environ['SERVER']
+    port = os.environ['PORT']
+    user = os.environ['USER']
+    password = os.environ['PASSWORD']
+    database = os.environ['DATABASE']
+    connection_string = f'DRIVER={driver};SERVER={server};PORT={port};UID={user};PWD={password};DATABASE={database}'
 
 class Database:
     def __init__(self):
