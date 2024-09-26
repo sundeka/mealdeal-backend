@@ -8,7 +8,7 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["https://mealdeal-backend.azurewebsites.net", "http://localhost:3000"]}})
+CORS(app, resources={r"/*": {"origins": ["https://blue-grass-08f521010.5.azurestaticapps.net", "http://localhost:3000"]}})
      
 @app.get("/")
 def default() -> Response:
