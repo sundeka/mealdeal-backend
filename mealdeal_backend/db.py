@@ -19,14 +19,14 @@ except KeyError:
 
 class Database:
     def __init__(self):
-        self.table_foods = "foods"
-        self.table_meals = "meals"
-        self.table_types = "meal_types"
-        self.table_meal_events = "meal_events"
-        self.table_users = "users"
-        self.table_plans = "plans"
-        self.table_plan_events = "plan_events"
-        self.table_food_categories = "food_categories"
+        self.table_foods = "mealdeal.foods"
+        self.table_meals = "mealdeal.meals"
+        self.table_types = "mealdeal.meal_types"
+        self.table_meal_events = "mealdeal.meal_events"
+        self.table_users = "mealdeal.users"
+        self.table_plans = "mealdeal.plans"
+        self.table_plan_events = "mealdeal.plan_events"
+        self.table_food_categories = "mealdeal.food_categories"
         self.db = pyodbc.connect(connection_string)
         self.cursor = self.db.cursor()
 
