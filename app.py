@@ -4,9 +4,12 @@ from mealdeal_backend.schema import Meal, MealEvent, Plan, PlanEvent
 from mealdeal_backend.db import Database
 from mealdeal_backend.auth import generate_token, parse_b64, is_permission, parse_user_id_from_token
 import pyodbc
+from flask_cors import CORS
+
 
 app = Flask(__name__)
-
+CORS(app, resources={r"/*": {"origins": ["https://mealdeal-backend.azurewebsites.net", "http://localhost:3000"]}})
+     
 @app.get("/")
 def default() -> Response:
     return {"message": "MealDeal backend successfully deployed!"}, 200
