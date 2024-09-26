@@ -2,6 +2,10 @@
 
 This repository contains the code for MealDeal's REST API. It is written in Python and runs on the Flask framework.
 
+## Deployment
+
+Changes can be deployed to production by running `az webapp up --name mealdeal-backend --runtime PYTHON:3.9` in the project root repository.
+
 ## Endpoints
 
 **NOTE:** without a valid JSON Web Token in the request header, all endpoints except `/login` return a `401 Unauthorized` HTTP response!
