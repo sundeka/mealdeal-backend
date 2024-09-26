@@ -39,7 +39,6 @@ class Database:
     def get_foods(self) -> List[Food]:
         foods = []
         self.cursor.execute(f'SELECT * FROM {self.table_foods}')
-        self.db.commit()
         for row in self.cursor.fetchall():
             foods.append(
                     Food(
@@ -66,7 +65,6 @@ class Database:
     def get_meals(self, user_id: str) -> List[Meal]:
         meals = []
         self.cursor.execute(f'SELECT * FROM {self.table_meals} WHERE user_id = ?', (user_id))
-        self.db.commit()
         for row in self.cursor.fetchall():
             meals.append(
                 Meal(
@@ -82,7 +80,6 @@ class Database:
     def get_types(self) -> List[MealType]:
         meal_types = []
         self.cursor.execute(f'SELECT * FROM {self.table_types}')
-        self.db.commit()
         for row in self.cursor.fetchall():
             meal_types.append(
                 MealType(
@@ -100,7 +97,6 @@ class Database:
     def get_meal_events_by_id(self, id: str) -> List[MealEvent]:
         meal_events = []
         self.cursor.execute(f'SELECT * FROM {self.table_meal_events} WHERE meal_id = ?', (id))
-        self.db.commit()
         for row in self.cursor.fetchall():
             meal_events.append(
                 MealEvent(
@@ -113,7 +109,6 @@ class Database:
     
     def get_food_name_by_food_id(self, id: str) -> str:
         self.cursor.execute(f'SELECT (name) FROM {self.table_foods} WHERE food_id = ?', (id))
-        self.db.commit()
         return self.cursor.fetchone()[0]
     
     def delete_meal(self, meal_id: str, user_id: str) -> None:
@@ -124,7 +119,6 @@ class Database:
 
     def update_meal(self, user_id: str, meal_id: str, meal_events: List[MealEvent]):
         self.cursor.execute(f'SELECT * from {self.table_meals} where meal_id = ? AND user_id = ?', (meal_id, user_id))
-        self.db.commit()
         if self.cursor.fetchone():
             self.cursor.execute(f'DELETE FROM {self.table_meal_events} WHERE meal_id = ?', (meal_id))
             self.cursor.executemany(f'INSERT INTO {self.table_meal_events} (meal_id, food_id, amount) VALUES (?, ?, ?)', meal_events)
@@ -139,7 +133,6 @@ class Database:
         Return user_id (str) if exists, otherwise None.
         """
         self.cursor.execute(f'SELECT user_id, password FROM {self.table_users} WHERE username = ?', (username))
-        self.db.commit()
         match = self.cursor.fetchone()
         if match:
             user_id = match[0]
@@ -156,7 +149,6 @@ class Database:
             plans_created=None
         )
         self.cursor.execute(f'SELECT username, created_at FROM {self.table_users} WHERE user_id = ?', (id))
-        self.db.commit()
         match = self.cursor.fetchone()
         if match:
             metadata.username = match[0]
@@ -164,11 +156,9 @@ class Database:
             if (metadata.account_created):
                 metadata.account_created = metadata.account_created.isoformat()
         self.cursor.execute(f'SELECT * FROM {self.table_meals} where user_id = ?', (id))
-        self.db.commit()
         match = self.cursor.fetchall()
         metadata.meals_created = len(match)
         self.cursor.execute(f'SELECT * FROM {self.table_plans} where user_id = ?', (id))
-        self.db.commit()
         match = self.cursor.fetchall()
         metadata.plans_created = len(match)
         return metadata
@@ -185,7 +175,6 @@ class Database:
     def get_plans(self, id: str) -> List[Plan]:
         plans: List[Plan] = []
         self.cursor.execute(f'SELECT plan_id, name, description, length, created_at, starting_from, is_continuous FROM {self.table_plans} WHERE user_id = ?', (id))
-        self.db.commit()
         for row in self.cursor.fetchall():
             starting_from = row[5]
             if starting_from:
@@ -211,7 +200,6 @@ class Database:
             self.cursor.execute(query, (id, start, end))
         else:
             self.cursor.execute(query, (id))
-        self.db.commit()
         meal_metadata_for_meal_id = {}
         plan_events: List[TimelinePlanEvent] = []
         for row in self.cursor.fetchall():
@@ -220,7 +208,6 @@ class Database:
                 # Only search meal data for a single id ONCE (avoid unnecessary search operations)
                 query = f'SELECT name, type FROM {self.table_meals} WHERE meal_id = ?'
                 self.cursor.execute(query, (meal_id))
-                self.db.commit()
                 result = self.cursor.fetchone()
                 meal_metadata_for_meal_id[meal_id] = {
                     "meal_name": result[0],
@@ -234,7 +221,6 @@ class Database:
                     WHERE meal_events.meal_id = ?
                 """
                 self.cursor.execute(query, (meal_id))
-                self.db.commit()
                 results = self.cursor.fetchall()
                 for food_row in results:
                     meal_metadata_for_meal_id[meal_id]["meal_contents"].append({food_row[0]: food_row[1]})
@@ -261,7 +247,6 @@ class Database:
 
     def get_food_categories(self) -> List[FoodCategory]:
         self.cursor.execute(f"SELECT * FROM {self.table_food_categories}")
-        self.db.commit()
         cats = []
         for row in self.cursor.fetchall():
             cats.append(
